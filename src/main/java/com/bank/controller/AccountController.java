@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +26,7 @@ import com.bank.model.Natural;
 import com.bank.model.Product;
 import com.bank.service.IAccountService;
 
+import io.netty.util.internal.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 
 import reactor.core.publisher.Flux;
@@ -58,7 +60,9 @@ public class AccountController {
 							Cards cards=new Cards();
 							cards.setIdproduct(p.getId());
 							cards.setNameproduct(p.getName());
-							cards.setAccountnumber("37364532162737");
+							Long numero= ThreadLocalRandom.current().nextLong(100000000,1000000000+1);
+							
+							cards.setAccountnumber(Long.toString(numero));
 							cards.setMaxmovements(0);
 							cards.setMaintenancecommission(1.5);
 							cards.setAmmount(1000);
@@ -93,7 +97,7 @@ public class AccountController {
 			 			
 			 			Boolean boo=false;
 			 			List<Cards> listCards= cp.getCards();
-			 			
+
 			 			for (Cards cards : listCards) {
 			 				if(cards.getNameproduct().equalsIgnoreCase("Ahorro") && p.getName().equalsIgnoreCase("Ahorro") || cards.getNameproduct().equalsIgnoreCase("Cuenta Corriente") && p.getName().equalsIgnoreCase("Cuenta Corriente")) {
 								boo=true;
@@ -105,7 +109,9 @@ public class AccountController {
 								Cards cards=new Cards();
 								cards.setIdproduct(p.getId());
 								cards.setNameproduct(p.getName());
-								cards.setAccountnumber("37364532162737");
+								Long numero= ThreadLocalRandom.current().nextLong(100000000,1000000000+1);
+								
+								cards.setAccountnumber(Long.toString(numero));
 								cards.setMaxmovements(4);
 								cards.setMaintenancecommission(1.5);
 								cards.setAmmount(0);
@@ -139,7 +145,9 @@ public class AccountController {
 			if(e.getName().equalsIgnoreCase("Plazo Fijo")) {
 				cards.setIdproduct(e.getId());
 				cards.setNameproduct(e.getName());
-				cards.setAccountnumber("32364534162737");
+				Long numero= ThreadLocalRandom.current().nextLong(100000000,1000000000+1);
+				
+				cards.setAccountnumber(Long.toString(numero));
 				cards.setMaxmovements(4);
 				cards.setMaintenancecommission(1.5);
 				cards.setAmmount(100);
@@ -168,7 +176,10 @@ public class AccountController {
 			
 				cards.setIdproduct(e.getId());
 				cards.setNameproduct(e.getName());
-				cards.setAccountnumber("32364534162737");
+				
+				Long numero= ThreadLocalRandom.current().nextLong(100000000,1000000000+1);
+				
+				cards.setAccountnumber(Long.toString(numero));
 				cards.setMaxmovements(4);
 				cards.setMaintenancecommission(1.5);
 				cards.setAmmount(100);
@@ -186,7 +197,19 @@ public class AccountController {
 	@GetMapping
 	public Flux<Account> findAll(){
 		
-		return accountService.findByAll();
+		return accountService.findByAll(); 
+	}
+	
+	@GetMapping("/{id}")
+	public Mono<Account> findByIdClient(@PathVariable String id){
+		
+		return accountService.findByIdClient(id);
+	}
+	
+	@DeleteMapping("/{id}")
+	public Mono<Void> delete(@PathVariable String id){
+		
+		return accountService.deleteById(id);
 	}
 	
 }

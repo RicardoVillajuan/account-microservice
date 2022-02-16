@@ -16,7 +16,9 @@ public interface IAccountService {
 	
 	Flux<Account> findByAll();
 	
+	Mono<Account> findById(String idclient);
 	
+	Mono<Void> deleteById(String id);
 	//Metodos para obtener registros de otras entidades
 	
 	Mono<Product> findByUrlIdProduct(String idproduct);	
