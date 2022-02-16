@@ -1,0 +1,13 @@
+spring: 
+  application:
+    name: account-service
+
+  cloud: 
+    config: 
+      uri: http://localhost:8090
+      username: nttdata
+      password: nttd4t4
+
+
+
+spring.data.mongodb.uri: mongodb+srv://admin:123@cluster0.xjk1b.mongodb.net/bootcamp2
