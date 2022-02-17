@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Natural {
+public class Customer {
 	
 	private String id;
-    private String dni;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String type;
+	private String typecustomer;
+	private String fullname;
+	private String email;
     private String profile;
+    private String typedocument;
+    private String documentnumber;
 }

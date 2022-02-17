@@ -22,7 +22,7 @@ public class Account {
 	@Id
 	private String id;
 	private String idclient;
-	private List<Cards> cards;
+	private List<Cards> cards;//te
 	
 	public Account(String idclient, List<Cards> cards) {
 		

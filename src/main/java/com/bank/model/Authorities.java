@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 public class Authorities {
 
-	List<Holders> holders;
-	List<Signatories> signatories;
+	List<Holders> holders;//titulares
+	List<Signatories> signatories;// firmantes
 }

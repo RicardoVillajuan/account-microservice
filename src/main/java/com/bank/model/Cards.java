@@ -21,7 +21,7 @@ public class Cards {
 	private double maintenancecommission;
 	private long ammount;
 	private Authorities authorities;
-	//objeto 
+	
 	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private Date date;
 }
