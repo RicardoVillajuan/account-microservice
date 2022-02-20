@@ -13,5 +13,5 @@ public interface AccountRepository extends ReactiveMongoRepository<Account, Stri
 	
 	Mono<Account> findByIdclient(String idclient);
 	
-
+	Mono<Account> findByIdclientAndIdproductAndNameproduct(String idclient, String idproduct,String nameproduct);
 }

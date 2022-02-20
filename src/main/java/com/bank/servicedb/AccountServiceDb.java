@@ -45,106 +45,8 @@ public class AccountServiceDb implements IAccountService {
 		return repoAccount.deleteById(id);
 	}
 
-	@Override
-	public Mono<Account> create(String idcustomer, String idproduct, Authorities authorities) {
-		// TODO Auto-generated method stub
-		Mono<Customer> customer = repoWeb.getCustomer(idcustomer);
-		Mono<Product> product = repoWeb.getProduct(idproduct);
-		Mono<Account> objAccount = repoAccount.findByIdclient(idcustomer);
+	
 
-		return objAccount.flatMap(a -> {
-			return customer.flatMap(c -> {
-				return product.flatMap(p -> {
-
-					for (Cards card : a.getCards()) {
-						if (card.getNameproduct().equalsIgnoreCase("ahorro") && p.getName().equalsIgnoreCase("ahorro")
-								|| card.getNameproduct().equalsIgnoreCase("Cuenta Corriente")
-										&& p.getName().equalsIgnoreCase("Cuenta Corriente")
-								|| card.getNameproduct().equalsIgnoreCase("Personal")
-										&& p.getName().equalsIgnoreCase("Personal")
-								|| card.getNameproduct().equalsIgnoreCase("Personal")
-										&& p.getName().equalsIgnoreCase("Personal")) {
-							return Mono.error(new Exception(
-									"Alcanzo el limite maximo para adquirir una cuenta con ese producto"));
-						}
-					}
-					
-					Cards cards = new Cards();
-					Long numero = ThreadLocalRandom.current().nextLong(100000000, 1000000000 + 1);
-					cards.setAccountnumber(Long.toString(numero));
-					cards.setAmmount(23);
-					cards.setDate(new Date());
-					cards.setIdproduct(p.getId());
-					cards.setNameproduct(p.getName());
-					
-					switch (p.getType().toUpperCase()) {
-
-					case "PASIVOS":
-						
-						cards.setMaxmovements(0);
-						if (p.getName().equalsIgnoreCase("AHORRO")) {
-							cards.setMaxmovements(3);
-						}
-						cards.setMaintenancecommission(2);
-						if (p.getName().equalsIgnoreCase("AHORRO") || p.getName().equalsIgnoreCase("PLAZO FIJO")) {
-							cards.setMaintenancecommission(0);
-						}
-						a.getCards().add(cards);
-						a.setCards(a.getCards());
-						return repoAccount.save(a);
-
-					case "ACTIVOS":
-						
-						cards.setMaxmovements(0);
-						cards.setMaintenancecommission(0);
-						a.getCards().add(cards);
-						a.setCards(a.getCards());
-						return repoAccount.save(a);
-
-					default:
-						return Mono.error(new Exception("Su tipo de Cuenta no se encuentra en el patron "));
-					}
-					
-				});
-
-			});
-		}).switchIfEmpty(createAccount(customer, product, authorities));
-
-	}
-
-	private Mono<Account> createAccount(Mono<Customer> custome, Mono<Product> prod, Authorities autoriti) {
-		// TODO Auto-generated method stub
-
-		return custome.flatMap(cus -> {
-			return prod.flatMap(pro -> {
-				Account acco = new Account();
-				List<Cards> listCards = new ArrayList<>();
-				Cards cards = new Cards();
-
-				Long numero = ThreadLocalRandom.current().nextLong(100000000, 1000000000 + 1);
-				cards.setIdproduct(pro.getId());
-				acco.setIdclient(cus.getId());
-				cards.setAccountnumber(Long.toString(numero));
-				cards.setAmmount(0);
-				cards.setDate(new Date());
-				cards.setMaxmovements(0);
-				if (pro.getName().equalsIgnoreCase("AHORRO")) {
-					cards.setMaxmovements(3);
-				}
-				cards.setMaintenancecommission(2);
-				if (pro.getName().equalsIgnoreCase("AHORRO") || pro.getName().equalsIgnoreCase("PLAZO FIJO")) {
-					cards.setMaintenancecommission(0);
-				}
-				cards.setNameproduct(pro.getName());
-				cards.setAuthorities(autoriti);
-				listCards.add(cards);
-				acco.setCards(listCards);
-
-				return repoAccount.save(acco);
-			});
-
-		});
-	}
 
 	@Override
 	public Mono<Account> findByIdClient(String idclient) {
@@ -156,6 +58,124 @@ public class AccountServiceDb implements IAccountService {
 	public Mono<Account> update(String id, Account account) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Mono<Account> createAccountAhorro(Account account) {
+		// TODO Auto-generated method stub
+		Mono<Account> objAccount = repoAccount.findByIdclientAndIdproductAndNameproduct(account.getIdclient(),account.getIdproduct(),account.getNameproduct());
+		Mono<Customer> objClient = repoWeb.getCustomer(account.getIdclient());
+		
+		Long numero = ThreadLocalRandom.current().nextLong(100000000, 1000000000 + 1);
+		account.setAccountnumber(Long.toString(numero));
+		account.setAmmount(account.getAmmount());
+		account.setNameproduct(account.getNameproduct());
+		account.setMaintenancecommission(0);
+		account.setMaxmovements(3);
+		
+		account.setDate(new Date());
+		
+		return objClient.doOnNext(e->{
+			if(e.getTypecustomer().equalsIgnoreCase("EMPRESARIAL")) {
+				throw new RuntimeException("Usted es un cliente empresarial, no puede tener una cuenta de ahorro");
+			}
+			
+		}).flatMap(e->{
+			return objAccount.doOnNext(a->{
+				if(e.getTypecustomer().equalsIgnoreCase("PERSONAL"))
+					throw new RuntimeException("Usted ya tiene una cuenta de Ahorro no puede tener mas");
+				
+			}).flatMap(c->{
+				
+				return repoAccount.save(account);
+			})
+			.switchIfEmpty(save(account));
+		});
+	}
+	
+	@Override
+	public Mono<Account> createAccountCorriente(Account account) {
+		// TODO Auto-generated method stub
+		Mono<Customer> objClient = repoWeb.getCustomer(account.getIdclient());
+				
+		Long numero = ThreadLocalRandom.current().nextLong(100000000, 1000000000 + 1);
+		account.setAccountnumber(Long.toString(numero));
+		account.setAmmount(account.getAmmount());
+		account.setNameproduct(account.getNameproduct());
+		account.setMaintenancecommission(1.5);
+		account.setMaxmovements(3);
+		account.setDate(new Date());
+		
+		return objClient.flatMap(e->{
+			Mono<Account> objAccount = repoAccount.findByIdclientAndIdproductAndNameproduct(account.getIdclient(),account.getIdproduct(),account.getNameproduct());
+			if(e.getTypecustomer().equalsIgnoreCase("EMPRESARIAL"))
+				return repoAccount.save(account);
+			
+			return objAccount.doOnNext(a->{
+				throw new RuntimeException("Usted solo puede tener una cuenta Corriente");
+				
+			}).switchIfEmpty(save(account));
+		});
+	}
+
+	@Override
+	public Mono<Account> createAccountPlazoFijo(Account account) {
+		// TODO Auto-generated method stub
+		Mono<Customer> objClient = repoWeb.getCustomer(account.getIdclient());
+		
+		
+		Long numero = ThreadLocalRandom.current().nextLong(100000000, 1000000000 + 1);
+		account.setAccountnumber(Long.toString(numero));
+		account.setAmmount(account.getAmmount());
+		account.setNameproduct(account.getNameproduct());
+		account.setMaintenancecommission(0);
+		account.setMaxmovements(3);
+		account.setDate(new Date());
+		
+		return objClient.doOnNext(e->{
+			if(e.getTypecustomer().equalsIgnoreCase("EMPRESARIAL")) {
+				throw new RuntimeException("Usted es un cliente empresarial, no puede tener una Cuenta a Plazo Fijo");
+			}
+			
+		}).flatMap(e->{
+			return repoAccount.save(account);
+		});
+	}
+
+	private Mono<Account> save(Account account) {
+		// TODO Auto-generated method stub
+		
+		return repoAccount.save(account);
+	}
+
+	@Override
+	public Mono<Account> createAccountCredito(Account account) {
+		// TODO Auto-generated method stub
+		Mono<Account> objAccount = repoAccount.findByIdclientAndIdproductAndNameproduct(account.getIdclient(),account.getIdproduct(),account.getNameproduct());
+		Mono<Customer> objClient = repoWeb.getCustomer(account.getIdclient());
+		
+		Long numero = ThreadLocalRandom.current().nextLong(100000000, 1000000000 + 1);
+		account.setAccountnumber(Long.toString(numero));
+		account.setAmmount(account.getAmmount());
+		account.setNameproduct(account.getNameproduct());
+		account.setMaintenancecommission(0);
+		account.setDate(new Date());
+		
+		return objClient.flatMap(e->{
+			if(e.getTypecustomer().equalsIgnoreCase("EMPRESARIAL"))
+				return repoAccount.save(account);
+		
+			return objAccount.doOnNext(a->{
+					throw new RuntimeException("Usted ya tiene un producto de credito");
+			}).switchIfEmpty(savecredit(e,account));
+		});
+	}
+
+	private  Mono<Account> savecredit(Customer c, Account account) {
+		// TODO Auto-generated method stub
+		if(c.getTypecustomer().equalsIgnoreCase("PERSONAL") && account.getNameproduct().equalsIgnoreCase("EMPRESARIAL")) 
+			throw new RuntimeException("Usted es un tipo personal, no puede tener un producto de tipo empresarial");
+		return repoAccount.save(account);
 	}
 
 }

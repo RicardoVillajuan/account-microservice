@@ -17,7 +17,13 @@ public interface IAccountService {
 	
 	Mono<Void> deleteById(String id);
 	
-	Mono<Account> create(String idcustomer,String idproduct,Authorities authorities);
+	Mono<Account> createAccountAhorro(Account account);
+	
+	Mono<Account> createAccountCorriente(Account account);
+	
+	Mono<Account> createAccountPlazoFijo(Account account);
+	
+	Mono<Account> createAccountCredito(Account account);
 	
 	Mono<Account> update(String id, Account account);
 	
