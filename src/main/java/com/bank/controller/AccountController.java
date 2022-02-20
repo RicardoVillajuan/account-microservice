@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -48,16 +49,14 @@ public class AccountController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public Mono<Account> saveCustomer(@PathVariable String idcustomer,@PathVariable String idproduct,@RequestBody Authorities authorities){
 		
-		//Mono<Account> account= accountService.findByIdClient(idclient);
-		//Mono<Customer> customer=accountService.findByUrlIdNatural(idclient);
-		//Mono<Product> product=accountService.findByUrlIdProduct(idproduct);
-		Authorities s=new Authorities();
-		s=authorities;
-		System.out.println(s+"---------------------");
 		return accountService.create(idcustomer, idproduct,authorities);
 	}
 	
-	
+	@PutMapping("/{id}")
+	public Mono<Account> update(@PathVariable String id,@RequestBody Account account){
+		
+		return accountService.update(id, account);
+	}
 	
 	@GetMapping
 	public Flux<Account> findAll(){
