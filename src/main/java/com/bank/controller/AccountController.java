@@ -49,11 +49,7 @@ public class AccountController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public Mono<Account> saveAccountAhorro(@RequestBody Account account){
 		
-		return account.getNameproduct().equalsIgnoreCase("AHORRO") ? accountService.createAccountAhorro(account)  
-				: account.getNameproduct().equalsIgnoreCase("CUENTA CORRIENTE") ? accountService.createAccountCorriente(account) 
-					: account.getNameproduct().equalsIgnoreCase("PLAZO FIJO") ? accountService.createAccountPlazoFijo(account) 
-						: account.getNameproduct().equalsIgnoreCase("PERSONAL") || account.getNameproduct().equalsIgnoreCase("EMPRESARIAL") 
-							? accountService.createAccountCredito(account) : Mono.error(new Exception("Escribio mal el nombre del producto o no lo ingreso"));
+		return accountService.createAccount(account);
 					
 	}
 	
