@@ -57,10 +57,22 @@ public class AccountController {
 					
 	}
 	
+	@GetMapping("/accountnumber/{accountnumber}")
+	public Mono<Account> findByAccountNumber(@PathVariable String accountnumber){
+		
+		return accountService.findByAccountNumber(accountnumber); 
+	}
+	
 	@PutMapping("/{id}")
 	public Mono<Account> update(@PathVariable String id,@RequestBody Account account){
 		
 		return accountService.update(id, account);
+	}
+	
+	@PutMapping("/accountnumber/{accountnumber}")
+	public Mono<Account> updateByAccountNumber(@PathVariable String accountnumber,@RequestBody Account account){
+		
+		return accountService.update(accountnumber, account);
 	}
 	
 	@GetMapping
@@ -70,10 +82,11 @@ public class AccountController {
 	}
 	
 	@GetMapping("/{id}")
-	public Mono<Account> findByIdClient(@PathVariable String id){
+	public Flux<Account> findByIdClient(@PathVariable String id){
 		
-		return accountService.findByIdClient(id);
+		return accountService.findByIdClientAll(id);
 	}
+	
 	
 	@DeleteMapping("/{id}")
 	public Mono<Void> delete(@PathVariable String id){

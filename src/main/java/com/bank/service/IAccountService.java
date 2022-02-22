@@ -11,7 +11,9 @@ import reactor.core.publisher.Mono;
 
 public interface IAccountService {
 	
-	Mono<Account> findByIdClient(String idclient);
+	
+	
+	Mono<Account> findById(String idaccount);
 	
 	Flux<Account> findByAll();
 	
@@ -26,5 +28,9 @@ public interface IAccountService {
 	Mono<Account> createAccountCredito(Account account);
 	
 	Mono<Account> update(String id, Account account);
+	
+	Mono<Account> findByAccountNumber(String accountnumber);
+	
+	Flux<Account> findByIdClientAll(String idclient);
 	
 }
