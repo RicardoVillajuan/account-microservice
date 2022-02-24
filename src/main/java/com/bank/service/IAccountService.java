@@ -21,8 +21,9 @@ public interface IAccountService {
 	
 	Mono<Account> createAccount(Account account);
 	
+	Mono<Account> updateById(String id, Account account);
 	
-	Mono<Account> update(String id, Account account);
+	Mono<Account> updateByAccountNumber(String accountnumber, Account account);
 	
 	Mono<Account> findByAccountNumber(String accountnumber);
 	

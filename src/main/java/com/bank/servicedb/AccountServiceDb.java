@@ -52,9 +52,10 @@ public class AccountServiceDb implements IAccountService {
 	}
 
 	@Override
-	public Mono<Account> update(String id, Account account) {
+	public Mono<Account> updateByAccountNumber(String accountnumber, Account account) {
 		
-		return repoAccount.findByAccountnumber(id).flatMap(e -> {
+		return repoAccount.findByAccountnumber(accountnumber).flatMap(e -> {
+			account.setId(e.getId());
 			return repoAccount.save(account);
 		});
 	}
@@ -116,6 +117,15 @@ public class AccountServiceDb implements IAccountService {
 	public Mono<Account> findById(String idaccount) {
 		
 		return repoAccount.findById(idaccount);
+	}
+
+	@Override
+	public Mono<Account> updateById(String id, Account account) {
+		// TODO Auto-generated method stub
+		return repoAccount.findById(id).flatMap(e -> {
+			account.setId(id);
+			return repoAccount.save(account);
+		});
 	}
 
 }
