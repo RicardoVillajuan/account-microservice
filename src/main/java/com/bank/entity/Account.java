@@ -35,11 +35,4 @@ public class Account {
 	
 	private Boolean status=true;
 	
-	
-	
-	
-	
-	
-	
-	
 }

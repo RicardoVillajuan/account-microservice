@@ -1,5 +1,7 @@
 package com.bank.repository;
 
+import java.util.Date;
+
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,10 +16,12 @@ public interface AccountRepository extends ReactiveMongoRepository<Account, Stri
 	
 	
 	Mono<Account> findByIdcustomerAndIdproduct(String idcustomer, String idproduct);
+	
+	Mono<Account> findByIdcustomerAndNameproduct(String idcustomer, String nameproduct);
 
 	Mono<Account> findByAccountnumber(String accountnumber);
 	
 	Flux<Account> findByIdcustomer(String idcustomer);
 	
-	
+	Flux<Account> findByCreationdateBetween(Date startdate, Date enddate);
 }

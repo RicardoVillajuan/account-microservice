@@ -1,11 +1,7 @@
 package com.bank.service;
 
+import java.util.Date;
 import com.bank.entity.Account;
-import com.bank.model.Authorities;
-import com.bank.model.Customer;
-import com.bank.model.Product;
-import com.bank.model.Signatories;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -29,4 +25,5 @@ public interface IAccountService {
 	
 	Flux<Account> findByIdClientAll(String idclient);
 	
+	Flux<Account> findByDate(Date startdate, Date enddate,String idproduct);
 }
